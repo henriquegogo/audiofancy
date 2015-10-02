@@ -1,10 +1,12 @@
 var bpm = 220;
 var bpm_ratio = Math.floor(60000 / bpm);
-var current_time = 0;
+var current_millisecond = 0, current_bar = 1;
 
 setInterval(function() {
-  if (current_time % bpm_ratio === 0) {
-    console.log(current_time);
+  current_millisecond++;
+  current_bar = Math.floor(current_millisecond / bpm_ratio);
+
+  if (current_millisecond % bpm_ratio === 0) {
+    console.log(current_bar);
   }
-  current_time++;
 }, 0);
