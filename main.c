@@ -3,12 +3,10 @@
 #include <SDL2/SDL_mixer.h>
 
 int mix_audio;
-int channel;
 
 void play(char* file_path) {
   Mix_Chunk *sample = Mix_LoadWAV(file_path);
-  Mix_PlayChannel(channel, sample, 0);
-  channel++;
+  Mix_PlayChannel(-1, sample, 0);
   // Mix_FreeChunk(sample);
 }
 
