@@ -24,12 +24,18 @@ void deinitialize() {
 
 int main(int argc, char const *argv[]) {
   initialize();
-  play("./test.wav");
-  SDL_Delay(1000);
-  play("./test.wav");
-  SDL_Delay(1000);
-  play("./test.wav");
-  SDL_Delay(3000);
+  // play("./test.wav");
+  // SDL_Delay(1000);
+  // play("./test.wav");
+  // SDL_Delay(1000);
+  // play("./test.wav");
+  // SDL_Delay(3000);
+
+  for(;;) {
+    int key = getchar();
+    printf("You clicked on: %i\n", key);
+  }
+
   deinitialize();
 
   return 0;
