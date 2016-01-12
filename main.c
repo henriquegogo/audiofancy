@@ -24,17 +24,17 @@ void deinitialize() {
 
 int main(int argc, char const *argv[]) {
   initialize();
-  // play("./test.wav");
-  // SDL_Delay(1000);
-  // play("./test.wav");
-  // SDL_Delay(1000);
-  // play("./test.wav");
-  // SDL_Delay(3000);
 
-  for(;;) {
-    int key = getchar();
-    printf("You clicked on: %i\n", key);
+  int key;
+
+  system("/bin/stty raw");
+  while (key = getchar() != '.') {
+    play("./test.wav");
+    printf("%c\n\r", key);
   }
+  system("/bin/stty cooked");
+
+  printf("Bye bye!\n");
 
   deinitialize();
 
