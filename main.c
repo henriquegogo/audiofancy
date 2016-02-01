@@ -11,23 +11,23 @@ void play(char* file_path) {
   // Mix_FreeChunk(sample);
 }
 
-void initialize() {
-  SDL_Init(SDL_INIT_AUDIO);
+int main() {
+  SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO);
   Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
   Mix_Init(0);
+
+  SDL_Window *window;
+  window = SDL_CreateWindow(
+    "Test Application",
+    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+    640, 480,
+    SDL_WINDOW_SHOWN
+  );
+
+  SDL_Delay(3000);
+
+  /*
   initscr();
-}
-
-void deinitialize() {
-  endwin();
-  Mix_Quit();
-  Mix_CloseAudio();
-  SDL_Quit();
-}
-
-int main(int argc, char const *argv[]) {
-  initialize();
-
   int key;
   while (1) {
     key = getch();
@@ -35,8 +35,13 @@ int main(int argc, char const *argv[]) {
     else if (key == 'z') play("./kick.wav");
     else if (key == 'x') play("./snare.wav");
   }
+  endwin();
+  */
 
-  deinitialize();
+  SDL_DestroyWindow(window);
+  Mix_Quit();
+  Mix_CloseAudio();
+  SDL_Quit();
 
   return 0;
 }
