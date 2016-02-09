@@ -30,40 +30,53 @@ int bits_from_sf_format(int format) {
     return bits;
 }
 
-int main() {
-    ao_device *device;
-    ao_sample_format format;
-    int driver_id;
+typedef struct Sampler {
     short *buffer;
     long buffer_size;
-    SNDFILE *file;
-    SF_INFO file_info;
+    ao_sample_format format;
+} Sampler;
 
-    // sndfile
-    file = sf_open("snare.wav", SFM_READ, &file_info); 
-    buffer_size = file_info.channels * file_info.frames * sizeof(short);
-    buffer = calloc(buffer_size, sizeof(short));
-    sf_read_short(file, buffer, buffer_size);
+Sampler Sampler_new(char filename[]) {
+    SF_INFO file_info;
+    Sampler sampler;
+
+    SNDFILE *file = sf_open(filename, SFM_READ, &file_info); 
+    sampler.buffer_size = file_info.channels * file_info.frames * sizeof(short);
+    sampler.buffer = calloc(sampler.buffer_size, sizeof(short));
+    sf_read_short(file, sampler.buffer, sampler.buffer_size);
     sf_close(file);
 
-    // ao
+    memset(&sampler.format, 0, sizeof(sampler.format));
+    sampler.format.bits = bits_from_sf_format(file_info.format);
+    sampler.format.channels = file_info.channels;
+    sampler.format.rate = file_info.samplerate;
+    sampler.format.byte_format = AO_FMT_LITTLE;
+
+    return sampler;
+}
+
+void Sampler_play(Sampler sampler) {
+    int driver_id = ao_default_driver_id();
+    ao_device *device = ao_open_live(driver_id, &sampler.format, NULL); 
+    ao_play(device, (char *)sampler.buffer, sampler.buffer_size);
+    ao_close(device);
+}
+
+void Sampler_cleanup(Sampler sampler) {
+    free(sampler.buffer);
+}
+
+int main() {
     ao_initialize();
 
-    driver_id = ao_default_driver_id();
+    Sampler sampler = Sampler_new("snare.wav");
+    Sampler_play(sampler);
+    Sampler_play(sampler);
+    Sampler_play(sampler);
+    Sampler_play(sampler);
+    Sampler_cleanup(sampler);
 
-    memset(&format, 0, sizeof(format));
-    format.bits = bits_from_sf_format(file_info.format);
-    format.channels = file_info.channels;
-    format.rate = file_info.samplerate;
-    format.byte_format = AO_FMT_LITTLE;
-
-    device = ao_open_live(driver_id, &format, NULL); 
-
-    ao_play(device, (char *)buffer, buffer_size);
-
-    ao_close(device);
     ao_shutdown();
-    free(buffer);
 
     return 0;
 }
