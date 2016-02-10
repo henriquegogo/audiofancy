@@ -2,6 +2,7 @@
 #include <string.h>
 #include <ao/ao.h>
 #include <sndfile.h>
+#include <pthread.h>
 
 int bits_from_sf_format(int format) {
     int bits = 16;
@@ -57,7 +58,7 @@ Sampler Sampler_new(char filename[]) {
 
 void Sampler_play(Sampler sampler) {
     int driver_id = ao_default_driver_id();
-    ao_device *device = ao_open_live(driver_id, &sampler.format, NULL); 
+    ao_device *device = ao_open_live(driver_id, &sampler.format, NULL);
     ao_play(device, (char *)sampler.buffer, sampler.buffer_size);
     ao_close(device);
 }
@@ -71,7 +72,9 @@ int main() {
 
     Sampler snare = Sampler_new("snare.wav");
     Sampler kick = Sampler_new("kick.wav");
+    Sampler test = Sampler_new("test.wav");
 
+    Sampler_play(test);
     Sampler_play(kick);
     Sampler_play(snare);
     Sampler_play(kick);
