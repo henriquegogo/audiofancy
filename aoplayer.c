@@ -69,12 +69,16 @@ void Sampler_cleanup(Sampler sampler) {
 int main() {
     ao_initialize();
 
-    Sampler sampler = Sampler_new("snare.wav");
-    Sampler_play(sampler);
-    Sampler_play(sampler);
-    Sampler_play(sampler);
-    Sampler_play(sampler);
-    Sampler_cleanup(sampler);
+    Sampler snare = Sampler_new("snare.wav");
+    Sampler kick = Sampler_new("kick.wav");
+
+    Sampler_play(kick);
+    Sampler_play(snare);
+    Sampler_play(kick);
+    Sampler_play(snare);
+
+    Sampler_cleanup(snare);
+    Sampler_cleanup(kick);
 
     ao_shutdown();
 
