@@ -37,51 +37,61 @@ typedef struct Sampler {
     ao_sample_format format;
 } Sampler;
 
-Sampler Sampler_new(char filename[]) {
+Sampler* Sampler_new(char filename[]) {
     SF_INFO file_info;
-    Sampler sampler;
+    Sampler *sampler = malloc(sizeof(Sampler));
 
     SNDFILE *file = sf_open(filename, SFM_READ, &file_info); 
-    sampler.buffer_size = file_info.channels * file_info.frames * sizeof(short);
-    sampler.buffer = calloc(sampler.buffer_size, sizeof(short));
-    sf_read_short(file, sampler.buffer, sampler.buffer_size);
+    sampler->buffer_size = file_info.channels * file_info.frames * sizeof(short);
+    sampler->buffer = calloc(sampler->buffer_size, sizeof(short));
+    sf_read_short(file, sampler->buffer, sampler->buffer_size);
     sf_close(file);
 
-    memset(&sampler.format, 0, sizeof(sampler.format));
-    sampler.format.bits = bits_from_sf_format(file_info.format);
-    sampler.format.channels = file_info.channels;
-    sampler.format.rate = file_info.samplerate;
-    sampler.format.byte_format = AO_FMT_LITTLE;
+    memset(&sampler->format, 0, sizeof(sampler->format));
+    sampler->format.bits = bits_from_sf_format(file_info.format);
+    sampler->format.channels = file_info.channels;
+    sampler->format.rate = file_info.samplerate;
+    sampler->format.byte_format = AO_FMT_LITTLE;
 
     return sampler;
 }
 
-void Sampler_play(Sampler sampler) {
+void Sampler_play(Sampler *sampler) {
     int driver_id = ao_default_driver_id();
-    ao_device *device = ao_open_live(driver_id, &sampler.format, NULL);
-    ao_play(device, (char *)sampler.buffer, sampler.buffer_size);
+    printf("Sampler format: %i\n", sampler->format.bits);
+    ao_device *device = ao_open_live(driver_id, &sampler->format, NULL);
+    ao_play(device, (char *)sampler->buffer, sampler->buffer_size);
     ao_close(device);
 }
 
-void Sampler_cleanup(Sampler sampler) {
-    free(sampler.buffer);
+void Sampler_cleanup(Sampler *sampler) {
+    free(sampler->buffer);
+    free(sampler);
 }
 
 int main() {
     ao_initialize();
 
-    Sampler snare = Sampler_new("snare.wav");
-    Sampler kick = Sampler_new("kick.wav");
-    Sampler test = Sampler_new("test.wav");
+    Sampler *snare = Sampler_new("snare.wav");
+    Sampler *kick = Sampler_new("kick.wav");
+    Sampler *test = Sampler_new("test.wav");
 
-    Sampler_play(test);
+    //Sampler_play(test);
     Sampler_play(kick);
     Sampler_play(snare);
     Sampler_play(kick);
-    Sampler_play(snare);
 
+    pthread_t thread_id[32];
+    printf("Before thread\n");    
+    pthread_create(&thread_id[0], NULL, (void *)Sampler_play, test);
+    pthread_create(&thread_id[1], NULL, (void *)Sampler_play, snare);
+    pthread_join(thread_id[0], NULL);
+    pthread_join(thread_id[1], NULL);
+    printf("After thread\n");
+    
     Sampler_cleanup(snare);
     Sampler_cleanup(kick);
+    Sampler_cleanup(test);
 
     ao_shutdown();
 
