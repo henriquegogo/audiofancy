@@ -64,6 +64,12 @@ void Sampler_play(Sampler *sampler) {
     ao_close(device);
 }
 
+void Sampler_playAsync(Sampler *sampler) {
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, (void *)Sampler_play, sampler);
+    pthread_detach(thread_id);
+}
+
 void Sampler_cleanup(Sampler *sampler) {
     free(sampler->buffer);
     free(sampler);
@@ -76,19 +82,15 @@ int main() {
     Sampler *kick = Sampler_new("kick.wav");
     Sampler *test = Sampler_new("test.wav");
 
-    //Sampler_play(test);
-    Sampler_play(kick);
+    Sampler_playAsync(test);
+    Sampler_play(snare);
+    Sampler_play(snare);
     Sampler_play(snare);
     Sampler_play(kick);
+    Sampler_play(kick);
+    Sampler_play(kick);
 
-    pthread_t thread_id[32];
-    printf("Before thread\n");    
-    pthread_create(&thread_id[0], NULL, (void *)Sampler_play, test);
-    pthread_create(&thread_id[1], NULL, (void *)Sampler_play, snare);
-    pthread_join(thread_id[0], NULL);
-    pthread_join(thread_id[1], NULL);
-    printf("After thread\n");
-    
+
     Sampler_cleanup(snare);
     Sampler_cleanup(kick);
     Sampler_cleanup(test);
