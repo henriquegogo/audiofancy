@@ -1,8 +1,12 @@
-all:
-	gcc -o main main.c -lSDL2 -lSDL2_mixer -lncurses && ./main
+BINNAME = sampler
+SRC = $(wildcard src/*.c)
+CFLAGS = -std=c99 -Wall -lm -lao -lsndfile -lpthread
 
-ao:
-	gcc -o aoplayer aoplayer.c -lao -lsndfile -lpthread && ./aoplayer
+all:
+	$(CC) -o $(BINNAME) $(SRC) $(CFLAGS)
+
+run:
+	./$(BINNAME)
 
 clean:
-	rm main
+	rm $(BINNAME)

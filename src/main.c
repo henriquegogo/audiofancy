@@ -78,9 +78,9 @@ void Sampler_cleanup(Sampler *sampler) {
 int main() {
     ao_initialize();
 
-    Sampler *snare = Sampler_new("snare.wav");
-    Sampler *kick = Sampler_new("kick.wav");
-    Sampler *test = Sampler_new("test.wav");
+    Sampler *snare = Sampler_new("samples/snare.wav");
+    Sampler *kick = Sampler_new("samples/kick.wav");
+    Sampler *test = Sampler_new("samples/test.wav");
 
     Sampler_playAsync(test);
     Sampler_play(snare);
