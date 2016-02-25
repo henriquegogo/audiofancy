@@ -1,6 +1,6 @@
 #include "sampler.h"
 
-int bits_from_sf_format(int format) {
+static int bits_from_sf_format(int format) {
     int bits = 16;
 
     switch (format & SF_FORMAT_SUBMASK) {
