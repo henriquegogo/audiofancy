@@ -7,6 +7,7 @@
 int main() {
     /* Midi */
     Midi *midi = Midi_new();
+    Midi_listen(midi);
     Midi_cleanup(midi);
 
     /* Player */

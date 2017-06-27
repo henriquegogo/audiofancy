@@ -10,6 +10,8 @@ typedef struct Midi {
 
 Midi* Midi_new();
 
+void Midi_listen(Midi *midi);
+
 void Midi_cleanup(Midi *midi);
 
 #endif
