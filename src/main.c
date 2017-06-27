@@ -1,9 +1,15 @@
 #include <ao/ao.h>
 #include <unistd.h>
 #include <time.h>
+#include "midi.h"
 #include "sampler.h"
 
 int main() {
+    /* Midi */
+    Midi *midi = Midi_new();
+
+    /* Player */
+
     ao_initialize();
 
     Sampler *snare = Sampler_new("samples/snare.wav");
