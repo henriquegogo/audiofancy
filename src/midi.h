@@ -2,7 +2,6 @@
 #define MIDI_H
 
 #include <stdio.h>
-#include <string.h>
 #include <alsa/asoundlib.h>
 
 typedef struct Midi {
