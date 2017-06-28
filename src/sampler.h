@@ -1,7 +1,6 @@
 #ifndef SAMPLER_H
 #define SAMPLER_H
 
-#include <stdio.h>
 #include <string.h>
 #include <pthread.h>
 #include <sndfile.h>

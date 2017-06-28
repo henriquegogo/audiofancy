@@ -28,36 +28,41 @@ static int bits_from_sf_format(int format) {
 }
 
 Sampler* Sampler_new(char filename[]) {
-    SF_INFO file_info;
     Sampler *sampler = malloc(sizeof(Sampler));
 
-    SNDFILE *file = sf_open(filename, SFM_READ, &file_info); 
-    sampler->buffer_size = file_info.channels * file_info.frames * sizeof(short);
-    sampler->buffer = calloc(sampler->buffer_size, sizeof(short));
-    sf_read_short(file, sampler->buffer, sampler->buffer_size);
-    sf_close(file);
+    if (filename != NULL) {
+        SF_INFO file_info;
+        SNDFILE *file = sf_open(filename, SFM_READ, &file_info); 
+        sampler->buffer_size = file_info.channels * file_info.frames * sizeof(short);
+        sampler->buffer = calloc(sampler->buffer_size, sizeof(short));
+        sf_read_short(file, sampler->buffer, sampler->buffer_size);
+        sf_close(file);
 
-    memset(&sampler->format, 0, sizeof(sampler->format));
-    sampler->format.bits = bits_from_sf_format(file_info.format);
-    sampler->format.channels = file_info.channels;
-    sampler->format.rate = file_info.samplerate;
-    sampler->format.byte_format = AO_FMT_LITTLE;
+        memset(&sampler->format, 0, sizeof(sampler->format));
+        sampler->format.bits = bits_from_sf_format(file_info.format);
+        sampler->format.channels = file_info.channels;
+        sampler->format.rate = file_info.samplerate;
+        sampler->format.byte_format = AO_FMT_LITTLE;
+    }
 
     return sampler;
 }
 
 void Sampler_play(Sampler *sampler) {
-    int driver_id = ao_default_driver_id();
-    printf("Sampler format: %i\n", sampler->format.bits);
-    ao_device *device = ao_open_live(driver_id, &sampler->format, NULL);
-    ao_play(device, (char *)sampler->buffer, sampler->buffer_size);
-    ao_close(device);
+    if (sampler != NULL) {
+        int driver_id = ao_default_driver_id();
+        ao_device *device = ao_open_live(driver_id, &sampler->format, NULL);
+        ao_play(device, (char *)sampler->buffer, sampler->buffer_size);
+        ao_close(device);
+    }
 }
 
 void Sampler_playAsync(Sampler *sampler) {
-    pthread_t thread_id;
-    pthread_create(&thread_id, NULL, (void *)Sampler_play, sampler);
-    pthread_detach(thread_id);
+    if (sampler != NULL) {
+        pthread_t thread_id;
+        pthread_create(&thread_id, NULL, (void *)Sampler_play, sampler);
+        pthread_detach(thread_id);
+    }
 }
 
 void Sampler_cleanup(Sampler *sampler) {

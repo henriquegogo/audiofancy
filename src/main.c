@@ -1,39 +1,28 @@
+#include <stdio.h>
 #include <ao/ao.h>
-#include <unistd.h>
-#include <time.h>
 #include "midi.h"
 #include "sampler.h"
 
-int main() {
-    /* Midi */
-    Midi *midi = Midi_new();
-    Midi_listen(midi);
-    Midi_cleanup(midi);
+Sampler* samples[127]; 
 
-    /* Player */
+void event_handler(snd_seq_event_t *event) {
+    Sampler_playAsync(samples[event->data.note.note]);
+}
 
+int main(int argc, char *argv[]) {
     ao_initialize();
 
-    Sampler *snare = Sampler_new("samples/snare.wav");
-    Sampler *kick = Sampler_new("samples/kick.wav");
-    Sampler *test = Sampler_new("samples/test.wav");
+    samples[60] = Sampler_new("samples/kick.wav");
+    samples[64] = Sampler_new("samples/snare.wav");
 
-    struct timespec delay;
-    delay.tv_sec = 0;
-    delay.tv_nsec = 450000000;
+    Midi *midi = Midi_new();
+    Midi_listen(midi, event_handler);
 
-    Sampler_playAsync(test);
-    for (int i = 0; i < 8; i++) {
-        Sampler_playAsync(kick);
-        if (i % 2) Sampler_playAsync(snare);
-        nanosleep(&delay, NULL);
+    Midi_cleanup(midi);
+    
+    for (int i = 0; i < sizeof(samples) / sizeof(samples[0]); i++) {
+        if (samples[i] != NULL) Sampler_cleanup(samples[i]);
     }
-
-    sleep(1);
-
-    Sampler_cleanup(snare);
-    Sampler_cleanup(kick);
-    Sampler_cleanup(test);
 
     ao_shutdown();
 

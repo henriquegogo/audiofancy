@@ -10,11 +10,15 @@ Midi* Midi_new() {
     return midi;
 }
 
-void Midi_listen(Midi *midi) {
+void Midi_listen(Midi *midi, void callback(snd_seq_event_t *event)) {
     while (1) {
         snd_seq_event_t *event = NULL;
         snd_seq_event_input(midi->seq, &event);
-        printf("Event: %i\n", event->type);
+
+        if (event->type == SND_SEQ_EVENT_NOTEON) {
+            if (event->data.note.note == 48) break;
+            callback(event);
+        }
     }
 }
 
