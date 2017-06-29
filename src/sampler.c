@@ -50,9 +50,16 @@ Sampler* Sampler_new(char filename[]) {
 
 void Sampler_play(Sampler *sampler) {
     if (sampler != NULL) {
-        int driver_id = ao_default_driver_id();
-        ao_device *device = ao_open_live(driver_id, &sampler->format, NULL);
-        ao_play(device, (char *)sampler->buffer, sampler->buffer_size);
+        ao_sample_format format = sampler->format;
+        format.rate = sampler->format.rate * 1; // Set speed
+
+        short *buffer = calloc(sampler->buffer_size, sizeof(short));
+        for (long i = 0; i < sampler->buffer_size; ++i) {
+            buffer[i] = sampler->buffer[i] * 1.0f; // Set volume
+        }
+
+        ao_device *device = ao_open_live(ao_default_driver_id(), &format, NULL);
+        ao_play(device, (char *)buffer, sampler->buffer_size);
         ao_close(device);
     }
 }
