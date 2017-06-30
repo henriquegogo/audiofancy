@@ -34,7 +34,7 @@ Sampler* Sampler_new(char filename[]) {
         SF_INFO file_info;
         SNDFILE *file = sf_open(filename, SFM_READ, &file_info); 
         sampler->buffer_size = file_info.channels * file_info.frames * sizeof(short);
-        sampler->buffer = calloc(sampler->buffer_size, sizeof(short));
+        sampler->buffer = malloc(sampler->buffer_size * sizeof(short));
         sf_read_short(file, sampler->buffer, sampler->buffer_size);
         sf_close(file);
 
@@ -53,7 +53,7 @@ void Sampler_play(Sampler *sampler) {
         ao_sample_format format = sampler->format;
         format.rate = sampler->format.rate * 1; // Set speed
 
-        short *buffer = calloc(sampler->buffer_size, sizeof(short));
+        short *buffer = malloc(sampler->buffer_size * sizeof(short));
         for (long i = 0; i < sampler->buffer_size; ++i) {
             buffer[i] = sampler->buffer[i] * 1.0f; // Set volume
         }
