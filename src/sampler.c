@@ -61,6 +61,7 @@ void Sampler_play(Sampler *sampler) {
         ao_device *device = ao_open_live(ao_default_driver_id(), &format, NULL);
         ao_play(device, (char *)buffer, sampler->buffer_size);
         ao_close(device);
+        free(buffer);
     }
 }
 
