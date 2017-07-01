@@ -6,7 +6,10 @@
 Sampler* samples[127]; 
 
 void event_handler(snd_seq_event_t *event) {
-    Sampler_playAsync(samples[event->data.note.note]);
+    int note = event->data.note.note;
+    float volume = 1.0;
+    float speed = 1.0;
+    Sampler_play(samples[note], volume, speed);
 }
 
 int main(int argc, char *argv[]) {

@@ -27,6 +27,12 @@ static int bits_from_sf_format(int format) {
     return bits;
 }
 
+struct thread_args {
+    Sampler *sampler;
+    float volume;
+    float speed;
+};
+
 Sampler* Sampler_init(char filename[]) {
     Sampler *sampler = malloc(sizeof(Sampler));
 
@@ -48,27 +54,36 @@ Sampler* Sampler_init(char filename[]) {
     return sampler;
 }
 
-void Sampler_play(Sampler *sampler) {
-    if (sampler != NULL) {
-        ao_sample_format format = sampler->format;
-        format.rate = sampler->format.rate * 1; // Set speed
+static void play(struct thread_args *args) {
+    Sampler *sampler = args->sampler;
+    float volume = args->volume;
+    float speed = args->speed;
+    free(args);
 
-        short *buffer = malloc(sampler->buffer_size * sizeof(short));
-        for (long i = 0; i < sampler->buffer_size; ++i) {
-            buffer[i] = sampler->buffer[i] * 1.0f; // Set volume
-        }
+    ao_sample_format format = sampler->format;
+    format.rate = sampler->format.rate * speed; // Set speed
 
-        ao_device *device = ao_open_live(ao_default_driver_id(), &format, NULL);
-        ao_play(device, (char *)buffer, sampler->buffer_size);
-        ao_close(device);
-        free(buffer);
+    short *buffer = malloc(sampler->buffer_size * sizeof(short));
+    for (long i = 0; i < sampler->buffer_size; ++i) {
+        buffer[i] = sampler->buffer[i] * volume; // Set volume
     }
+
+    ao_device *device = ao_open_live(ao_default_driver_id(), &format, NULL);
+    ao_play(device, (char *)buffer, sampler->buffer_size);
+    ao_close(device);
+
+    free(buffer);
 }
 
-void Sampler_playAsync(Sampler *sampler) {
+void Sampler_play(Sampler *sampler, float volume, float speed) {
     if (sampler != NULL) {
+        struct thread_args *args = malloc(sizeof(struct thread_args));
+        args->sampler = sampler;
+        args->volume = volume;
+        args->speed = speed;
+
         pthread_t thread_id;
-        pthread_create(&thread_id, NULL, (void *)Sampler_play, sampler);
+        pthread_create(&thread_id, NULL, (void *)play, args);
         pthread_detach(thread_id);
     }
 }

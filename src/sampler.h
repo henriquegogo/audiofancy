@@ -14,9 +14,7 @@ typedef struct Sampler {
 
 Sampler* Sampler_init(char filename[]);
 
-void Sampler_play(Sampler *sampler);
-
-void Sampler_playAsync(Sampler *sampler);
+void Sampler_play(Sampler *sampler, float volume, float speed);
 
 void Sampler_destroy(Sampler *sampler);
 
