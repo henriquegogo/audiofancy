@@ -12,12 +12,12 @@ typedef struct Sampler {
     ao_sample_format format;
 } Sampler;
 
-Sampler* Sampler_new(char filename[]);
+Sampler* Sampler_init(char filename[]);
 
 void Sampler_play(Sampler *sampler);
 
 void Sampler_playAsync(Sampler *sampler);
 
-void Sampler_cleanup(Sampler *sampler);
+void Sampler_destroy(Sampler *sampler);
 
 #endif

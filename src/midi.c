@@ -1,6 +1,6 @@
 #include "midi.h"
 
-Midi* Midi_new() {
+Midi* Midi_init() {
     Midi *midi = malloc(sizeof(Midi));
 
     snd_seq_open(&midi->seq, "default", SND_SEQ_OPEN_INPUT, 0);
@@ -22,7 +22,7 @@ void Midi_listen(Midi *midi, void callback(snd_seq_event_t *event)) {
     }
 }
 
-void Midi_cleanup(Midi *midi) {
+void Midi_destroy(Midi *midi) {
     free(midi->seq);
     free(midi);
 }

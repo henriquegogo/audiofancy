@@ -12,16 +12,16 @@ void event_handler(snd_seq_event_t *event) {
 int main(int argc, char *argv[]) {
     ao_initialize();
 
-    samples[60] = Sampler_new("samples/kick.wav");
-    samples[64] = Sampler_new("samples/snare.wav");
+    samples[60] = Sampler_init("samples/kick.wav");
+    samples[64] = Sampler_init("samples/snare.wav");
 
-    Midi *midi = Midi_new();
+    Midi *midi = Midi_init();
     Midi_listen(midi, event_handler);
 
-    Midi_cleanup(midi);
+    Midi_destroy(midi);
     
     for (int i = 0; i < sizeof(samples) / sizeof(samples[0]); i++) {
-        if (samples[i] != NULL) Sampler_cleanup(samples[i]);
+        if (samples[i] != NULL) Sampler_destroy(samples[i]);
     }
 
     ao_shutdown();

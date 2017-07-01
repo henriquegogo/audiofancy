@@ -27,7 +27,7 @@ static int bits_from_sf_format(int format) {
     return bits;
 }
 
-Sampler* Sampler_new(char filename[]) {
+Sampler* Sampler_init(char filename[]) {
     Sampler *sampler = malloc(sizeof(Sampler));
 
     if (filename != NULL) {
@@ -73,7 +73,7 @@ void Sampler_playAsync(Sampler *sampler) {
     }
 }
 
-void Sampler_cleanup(Sampler *sampler) {
+void Sampler_destroy(Sampler *sampler) {
     free(sampler->buffer);
     free(sampler);
 }
