@@ -6,10 +6,12 @@
 Sampler* samples[127]; 
 
 void event_handler(snd_seq_event_t *event) {
-    int note = event->data.note.note;
-    float volume = 1.0;
+    int midi_note = event->data.note.note;
+    int midi_velocity = event->data.note.velocity;
+
+    float volume = midi_velocity / 127.0;
     float speed = 1.0;
-    Sampler_play(samples[note], volume, speed);
+    Sampler_play(samples[midi_note], volume, speed);
 }
 
 int main(int argc, char *argv[]) {
