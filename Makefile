@@ -1,4 +1,4 @@
-BINNAME = sampler
+BINNAME = niobium
 SRC = $(wildcard src/*.c)
 CFLAGS = -std=gnu11 -Wall -lm -lpthread -lao -lsndfile -lasound
 
