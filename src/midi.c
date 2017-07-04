@@ -1,5 +1,10 @@
 #include "midi.h"
 
+struct thread_args_listen {
+    Midi *midi;
+    void (*callback)(snd_seq_event_t *event);
+};
+
 Midi* Midi_init() {
     Midi *midi = malloc(sizeof(Midi));
 
@@ -10,16 +15,29 @@ Midi* Midi_init() {
     return midi;
 }
 
-void Midi_listen(Midi *midi, void callback(snd_seq_event_t *event)) {
+static void listen(struct thread_args_listen *args) {
+    Midi *midi = args->midi;
+    void (*callback)(snd_seq_event_t *event) = args->callback;
+    free(args);
+
     while (1) {
         snd_seq_event_t *event = NULL;
         snd_seq_event_input(midi->seq, &event);
 
         if (event->type == SND_SEQ_EVENT_NOTEON) {
-            if (event->data.note.note == 48) break;
             callback(event);
         }
     }
+}
+
+void Midi_listen(Midi *midi, void callback(snd_seq_event_t *event)) {
+    struct thread_args_listen *args = malloc(sizeof(struct thread_args_listen));
+    args->midi = midi;
+    args->callback = callback;
+
+    pthread_t thread_id;
+    pthread_create(&thread_id, NULL, (void *)listen, args);
+    pthread_detach(thread_id);
 }
 
 void Midi_destroy(Midi *midi) {

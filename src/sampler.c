@@ -27,7 +27,7 @@ static int bits_from_sf_format(int format) {
     return bits;
 }
 
-struct thread_args {
+struct thread_args_play {
     Sampler *sampler;
     float volume;
     float speed;
@@ -54,7 +54,7 @@ Sampler* Sampler_init(char filename[]) {
     return sampler;
 }
 
-static void play(struct thread_args *args) {
+static void play(struct thread_args_play *args) {
     Sampler *sampler = args->sampler;
     float volume = args->volume;
     float speed = args->speed;
@@ -77,7 +77,7 @@ static void play(struct thread_args *args) {
 
 void Sampler_play(Sampler *sampler, float volume, float speed) {
     if (sampler != NULL) {
-        struct thread_args *args = malloc(sizeof(struct thread_args));
+        struct thread_args_play *args = malloc(sizeof(struct thread_args_play));
         args->sampler = sampler;
         args->volume = volume;
         args->speed = speed;

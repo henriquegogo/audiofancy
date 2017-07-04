@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <ao/ao.h>
+#include <pthread.h>
 #include "midi.h"
 #include "sampler.h"
 
@@ -22,6 +23,9 @@ int main(int argc, char *argv[]) {
 
     Midi *midi = Midi_init();
     Midi_listen(midi, event_handler);
+
+    printf("Press ENTER to quit");
+    getchar();
 
     Midi_destroy(midi);
     
