@@ -1,10 +1,24 @@
 #include <stdio.h>
+#include <termios.h>
 #include <ao/ao.h>
-#include <pthread.h>
 #include "midi.h"
 #include "sampler.h"
 
 Sampler* samples[127]; 
+static struct termios old, new;
+
+char getkey() 
+{
+    char key;
+    tcgetattr(0, &old); /* grab old terminal i/o settings */
+    new = old; /* make new settings same as old settings */
+    new.c_lflag &= ~ICANON; /* disable buffered i/o */
+    new.c_lflag &= ~ECHO; /* disable echo mode */
+    tcsetattr(0, TCSANOW, &new); /* use these new terminal i/o settings now */
+    key = getchar();
+    tcsetattr(0, TCSANOW, &old);
+    return key;
+}
 
 void event_handler(snd_seq_event_t *event) {
     int midi_note = event->data.note.note;
@@ -24,8 +38,9 @@ int main(int argc, char *argv[]) {
     Midi *midi = Midi_init();
     Midi_listen(midi, event_handler);
 
-    printf("Press ENTER to quit");
-    getchar();
+    printf("Press any key to quit\n");
+    char key = getkey();
+    printf("Key pressed: %c\n", key);
 
     Midi_destroy(midi);
     
