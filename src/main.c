@@ -36,13 +36,9 @@ int main(int argc, char *argv[]) {
     samples[60] = Sampler_init("samples/kick.wav");
     samples[64] = Sampler_init("samples/snare.wav");
 
-    Midi *midi = Midi_init();
-    Midi_listen(midi, midi_event_handler);
-
+    Midi_listen(midi_event_handler);
     Keyboard_listen(keyboard_key_handler);
 
-    Midi_destroy(midi);
-    
     for (int i = 0; i < sizeof(samples) / sizeof(samples[0]); i++) {
         if (samples[i] != NULL) Sampler_destroy(samples[i]);
     }
