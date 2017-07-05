@@ -1,32 +1,33 @@
-#include <stdio.h>
-#include <termios.h>
 #include <ao/ao.h>
 #include "midi.h"
 #include "sampler.h"
+#include "keyboard.h"
 
 Sampler* samples[127]; 
-static struct termios old, new;
 
-char getkey() 
-{
-    char key;
-    tcgetattr(0, &old); /* grab old terminal i/o settings */
-    new = old; /* make new settings same as old settings */
-    new.c_lflag &= ~ICANON; /* disable buffered i/o */
-    new.c_lflag &= ~ECHO; /* disable echo mode */
-    tcsetattr(0, TCSANOW, &new); /* use these new terminal i/o settings now */
-    key = getchar();
-    tcsetattr(0, TCSANOW, &old);
-    return key;
-}
-
-void event_handler(snd_seq_event_t *event) {
+void midi_event_handler(snd_seq_event_t *event) {
     int midi_note = event->data.note.note;
     int midi_velocity = event->data.note.velocity;
 
     float volume = midi_velocity / 127.0;
     float speed = 1.0;
     Sampler_play(samples[midi_note], volume, speed);
+}
+
+void keyboard_key_handler(char key) {
+    float volume = 1.0;
+    float speed = 1.0;
+
+    switch (key) {
+        case KEY_Z:
+            Sampler_play(samples[60], volume, speed);
+            break;
+        case KEY_C:
+            Sampler_play(samples[64], volume, speed);
+            break;
+        default:
+            printf("key: %c / code: %i\n", key, key);
+    } 
 }
 
 int main(int argc, char *argv[]) {
@@ -36,11 +37,9 @@ int main(int argc, char *argv[]) {
     samples[64] = Sampler_init("samples/snare.wav");
 
     Midi *midi = Midi_init();
-    Midi_listen(midi, event_handler);
+    Midi_listen(midi, midi_event_handler);
 
-    printf("Press any key to quit\n");
-    char key = getkey();
-    printf("Key pressed: %c\n", key);
+    Keyboard_listen(keyboard_key_handler);
 
     Midi_destroy(midi);
     
