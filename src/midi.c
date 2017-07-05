@@ -36,4 +36,6 @@ snd_seq_t* Midi_listen(void callback(snd_seq_event_t *event)) {
     pthread_t thread_id;
     pthread_create(&thread_id, NULL, (void *)listen, args);
     pthread_detach(thread_id);
+
+    return seq;
 }
