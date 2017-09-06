@@ -17,24 +17,24 @@ void midi_event_handler(snd_seq_event_t *event) {
 void keyboard_key_handler(char key) {
     float volume = 1.0;
     float speed = 1.0;
+    int charcode = (int)key;
 
-    switch (key) {
-        case KEY_Z:
-            Sampler_play(samples[60], volume, speed);
-            break;
-        case KEY_C:
-            Sampler_play(samples[64], volume, speed);
-            break;
-        default:
-            printf("key: %c / code: %i\n", key, key);
-    } 
+    if (charcode > 0) {
+        Sampler_play(samples[charcode], volume, speed);
+    }
+
+    printf("key: %c / code: %i / charcode: %i \n", key, key, charcode);
 }
 
 int main(int argc, char *argv[]) {
     ao_initialize();
 
-    samples[60] = Sampler_init("samples/kick.wav");
-    samples[64] = Sampler_init("samples/snare.wav");
+    for (int i = 0; i < 127; i++) {
+        char sample_path[1000];
+        sprintf(sample_path, "./samples/%d.wav", i);
+
+        samples[i] = Sampler_init(sample_path);
+    }
 
     Midi_listen(midi_event_handler);
     Keyboard_listen(keyboard_key_handler);

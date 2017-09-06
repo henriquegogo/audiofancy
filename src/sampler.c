@@ -76,7 +76,7 @@ static void play(struct thread_args_play *args) {
 }
 
 void Sampler_play(Sampler *sampler, float volume, float speed) {
-    if (sampler != NULL) {
+    if (sampler != NULL && sampler->format.channels <= 2) {
         struct thread_args_play *args = malloc(sizeof(struct thread_args_play));
         args->sampler = sampler;
         args->volume = volume;
