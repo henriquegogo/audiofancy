@@ -37,7 +37,7 @@ Sampler* Sampler_init(char filename[]) {
     Sampler *sampler = malloc(sizeof(Sampler));
 
     if (filename != NULL) {
-        SF_INFO file_info;
+        SF_INFO file_info = {};
         SNDFILE *file = sf_open(filename, SFM_READ, &file_info); 
         sampler->buffer_size = file_info.channels * file_info.frames * sizeof(short);
         sampler->buffer = malloc(sampler->buffer_size * sizeof(short));
@@ -76,7 +76,7 @@ static void play(struct thread_args_play *args) {
 }
 
 void Sampler_play(Sampler *sampler, float volume, float speed) {
-    if (sampler != NULL && sampler->format.channels <= 2) {
+    if (sampler != NULL) {
         struct thread_args_play *args = malloc(sizeof(struct thread_args_play));
         args->sampler = sampler;
         args->volume = volume;
