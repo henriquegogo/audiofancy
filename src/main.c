@@ -1,18 +1,9 @@
+#include <dirent.h>
 #include <ao/ao.h>
-#include "midi.h"
 #include "sampler.h"
 #include "keyboard.h"
 
-Sampler* samples[127]; 
-
-void midi_event_handler(snd_seq_event_t *event) {
-    int midi_note = event->data.note.note;
-    int midi_velocity = event->data.note.velocity;
-
-    float volume = midi_velocity / 127.0;
-    float speed = 1.0;
-    Sampler_play(samples[midi_note], volume, speed);
-}
+Sampler* instruments[127][127];
 
 void keyboard_key_handler(char key) {
     float volume = 1.0;
@@ -20,27 +11,54 @@ void keyboard_key_handler(char key) {
     int charcode = (int)key;
 
     if (charcode > 0) {
-        Sampler_play(samples[charcode], volume, speed);
+        Sampler_play(instruments[0][charcode-49], volume, speed);
     }
 
     printf("key: %c / code: %i / charcode: %i \n", key, key, charcode);
 }
 
+int list_directory(char *directory, char **dir_list) {
+    int index = 0;
+    DIR *samples_directory = opendir(directory);
+    struct dirent *directory_data;
+
+    while ( (directory_data = readdir(samples_directory)) ) {
+        if (strcmp(directory_data->d_name, "..") > 0) {
+            dir_list[index] = directory_data->d_name;
+            index++;
+        }
+    }
+    
+    closedir(samples_directory);
+
+    return index;
+}
+
 int main(int argc, char *argv[]) {
     ao_initialize();
 
-    for (int i = 0; i < 127; i++) {
-        char sample_path[1000];
-        sprintf(sample_path, "./samples/%d.wav", i);
+    char *sample_folders[127];
+    int sample_folders_count = list_directory("./samples", sample_folders); 
 
-        samples[i] = Sampler_init(sample_path);
+    for (int i = 0; i < sample_folders_count; i++) {
+
+        char files_folder[1000];
+        sprintf(files_folder, "./samples/%s", sample_folders[i]);
+        puts(files_folder);
+
+        for (int a = 0; a < 9; a++) {
+            char sample_path[1000];
+            sprintf(sample_path, "%s/%d.wav", files_folder, a+1);
+            instruments[i][a] = Sampler_init(sample_path);
+        }
     }
 
-    Midi_listen(midi_event_handler);
     Keyboard_listen(keyboard_key_handler);
 
-    for (int i = 0; i < sizeof(samples) / sizeof(samples[0]); i++) {
-        if (samples[i] != NULL) Sampler_destroy(samples[i]);
+    for (int y = 0; y < sizeof(instruments) / sizeof(instruments[0]); y++) {
+        for (int x = 0; x < sizeof(instruments[y]) / sizeof(instruments[0][0]); x++) {
+            if (instruments[y][x] != NULL) Sampler_destroy(instruments[y][x]);
+        }
     }
 
     ao_shutdown();
