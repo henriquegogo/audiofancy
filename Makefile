@@ -8,5 +8,8 @@ all:
 run:
 	./$(BINNAME)
 
+seq:
+	$(CC) -o seq src/seq.c -std=gnu11 -Wall
+
 clean:
 	rm $(BINNAME)
