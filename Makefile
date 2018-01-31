@@ -9,7 +9,7 @@ run:
 	./$(BINNAME)
 
 seq:
-	$(CC) -o seq src/seq.c -std=gnu11 -Wall
+	$(CXX) -o seq src/seq.cpp -std=c++11 -Wall
 
 clean:
 	rm $(BINNAME)
