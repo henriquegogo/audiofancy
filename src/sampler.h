@@ -12,9 +12,16 @@ typedef struct Sampler {
     ao_sample_format format;
 } Sampler;
 
+typedef struct player_options {
+    float volume;
+    float speed;
+    int begin;
+    int end;
+} player_options;
+
 Sampler* Sampler_init(char filename[]);
 
-void Sampler_play(Sampler *sampler, float volume, float speed);
+void Sampler_play(Sampler *sampler, struct player_options options);
 
 void Sampler_destroy(Sampler *sampler);
 

@@ -31,6 +31,8 @@ struct thread_args_play {
     Sampler *sampler;
     float volume;
     float speed;
+    int begin;
+    int end;
 };
 
 Sampler* Sampler_init(char filename[]) {
@@ -58,14 +60,22 @@ static void play(struct thread_args_play *args) {
     Sampler *sampler = args->sampler;
     float volume = args->volume;
     float speed = args->speed;
+    int begin = args->begin;
+    int end = args->end;
     free(args);
+
+    int buffer_begin = begin * sampler->format.rate / 1000;
+    int buffer_end = end * sampler->format.rate / 1000;
+    if (buffer_end > sampler->buffer_size || buffer_end < 0) {
+        buffer_end = sampler->buffer_size;
+    }
 
     ao_sample_format format = sampler->format;
     format.rate = sampler->format.rate * speed; // Set speed
 
     short *buffer = malloc(sampler->buffer_size * sizeof(short));
-    for (long i = 0; i < sampler->buffer_size; ++i) {
-        buffer[i] = sampler->buffer[i] * volume; // Set volume
+    for (long i = buffer_begin; i < buffer_end; ++i) {
+        buffer[i - buffer_begin] = sampler->buffer[i] * volume; // Set volume
     }
 
     ao_device *device = ao_open_live(ao_default_driver_id(), &format, NULL);
@@ -75,12 +85,14 @@ static void play(struct thread_args_play *args) {
     free(buffer);
 }
 
-void Sampler_play(Sampler *sampler, float volume, float speed) {
+void Sampler_play(Sampler *sampler, struct player_options options) {
     if (sampler != NULL) {
         struct thread_args_play *args = malloc(sizeof(struct thread_args_play));
         args->sampler = sampler;
-        args->volume = volume;
-        args->speed = speed;
+        args->volume = options.volume;
+        args->speed = options.speed;
+        args->begin = options.begin;
+        args->end = options.end;
 
         pthread_t thread_id;
         pthread_create(&thread_id, NULL, (void *)play, args);
