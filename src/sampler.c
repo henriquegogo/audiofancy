@@ -73,13 +73,13 @@ static void play(struct thread_args_play *args) {
         buffer_end = args->sampler->buffer_size;
     }
 
-    ao_sample_format format = args->sampler->format;
-    format.rate = args->sampler->format.rate * args->speed; // Set speed
-
     short *buffer = malloc((buffer_end - buffer_begin) * sizeof(short));
     for (long i = buffer_begin; i < buffer_end; ++i) {
         buffer[i - buffer_begin] = args->sampler->buffer[i] * args->volume; // Set volume
     }
+
+    ao_sample_format format = args->sampler->format;
+    format.rate = args->sampler->format.rate * args->speed; // Set speed
 
     free(args);
 
