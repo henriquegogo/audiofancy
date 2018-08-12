@@ -67,20 +67,18 @@ Sampler* Sampler_init(char filename[]) {
 }
 
 static void play(struct thread_args_play *args) {
-    Sampler *sampler = args->sampler;
-
-    int buffer_begin = args->begin * sampler->format.rate / 1000;
-    int buffer_end = args->end * sampler->format.rate / 1000;
-    if (buffer_end > sampler->buffer_size || buffer_end < 0) {
-        buffer_end = sampler->buffer_size;
+    int buffer_begin = args->begin * args->sampler->format.rate / 1000;
+    int buffer_end = args->end * args->sampler->format.rate / 1000;
+    if (buffer_end > args->sampler->buffer_size || buffer_end < 0) {
+        buffer_end = args->sampler->buffer_size;
     }
 
-    ao_sample_format format = sampler->format;
-    format.rate = sampler->format.rate * args->speed; // Set speed
+    ao_sample_format format = args->sampler->format;
+    format.rate = args->sampler->format.rate * args->speed; // Set speed
 
-    short *buffer = malloc(sampler->buffer_size * sizeof(short));
+    short *buffer = malloc((buffer_end - buffer_begin) * sizeof(short));
     for (long i = buffer_begin; i < buffer_end; ++i) {
-        buffer[i - buffer_begin] = sampler->buffer[i] * args->volume; // Set volume
+        buffer[i - buffer_begin] = args->sampler->buffer[i] * args->volume; // Set volume
     }
 
     free(args);
