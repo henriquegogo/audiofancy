@@ -35,6 +35,16 @@ struct thread_args_play {
     int end;
 };
 
+Sampler_play_params Sampler_play_params_default() {
+    struct Sampler_play_params options;
+    options.volume = 1.0;
+    options.speed = 1.0;
+    options.begin = 0;
+    options.end = -1;
+
+    return options;
+}
+
 Sampler* Sampler_init(char filename[]) {
     Sampler *sampler = malloc(sizeof(Sampler));
 
@@ -58,25 +68,22 @@ Sampler* Sampler_init(char filename[]) {
 
 static void play(struct thread_args_play *args) {
     Sampler *sampler = args->sampler;
-    float volume = args->volume;
-    float speed = args->speed;
-    int begin = args->begin;
-    int end = args->end;
-    free(args);
 
-    int buffer_begin = begin * sampler->format.rate / 1000;
-    int buffer_end = end * sampler->format.rate / 1000;
+    int buffer_begin = args->begin * sampler->format.rate / 1000;
+    int buffer_end = args->end * sampler->format.rate / 1000;
     if (buffer_end > sampler->buffer_size || buffer_end < 0) {
         buffer_end = sampler->buffer_size;
     }
 
     ao_sample_format format = sampler->format;
-    format.rate = sampler->format.rate * speed; // Set speed
+    format.rate = sampler->format.rate * args->speed; // Set speed
 
     short *buffer = malloc(sampler->buffer_size * sizeof(short));
     for (long i = buffer_begin; i < buffer_end; ++i) {
-        buffer[i - buffer_begin] = sampler->buffer[i] * volume; // Set volume
+        buffer[i - buffer_begin] = sampler->buffer[i] * args->volume; // Set volume
     }
+
+    free(args);
 
     ao_device *device = ao_open_live(ao_default_driver_id(), &format, NULL);
     ao_play(device, (char *)buffer, buffer_end - buffer_begin);
@@ -85,7 +92,7 @@ static void play(struct thread_args_play *args) {
     free(buffer);
 }
 
-void Sampler_play(Sampler *sampler, struct player_options options) {
+void Sampler_play(Sampler *sampler, struct Sampler_play_params options) {
     if (sampler != NULL) {
         struct thread_args_play *args = malloc(sizeof(struct thread_args_play));
         args->sampler = sampler;

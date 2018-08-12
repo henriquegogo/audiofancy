@@ -4,9 +4,9 @@
 
 // These global are just for development tests
 Sampler *global_drums;
-struct player_options global_kick;
-struct player_options global_snare;
-struct player_options global_hihat;
+struct Sampler_play_params global_kick;
+struct Sampler_play_params global_snare;
+struct Sampler_play_params global_hihat;
 
 void onclick(char key) {
     switch (key) {
@@ -32,21 +32,15 @@ int main(int argc, char *argv[]) {
 
     Sampler *drums = Sampler_init("./samples/drums.wav");
 
-    struct player_options kick;
-    kick.volume = 1.0;
-    kick.speed = 1.0;
+    struct Sampler_play_params kick = Sampler_play_params_default();
     kick.begin = 191;
     kick.end = 454;
 
-    struct player_options snare;
-    snare.volume = 1.0;
-    snare.speed = 1.0;
+    struct Sampler_play_params snare = Sampler_play_params_default();
     snare.begin = 4300;
     snare.end = 4790;
 
-    struct player_options hihat;
-    hihat.volume = 1.0;
-    hihat.speed = 1.0;
+    struct Sampler_play_params hihat = Sampler_play_params_default();
     hihat.begin = 4797;
     hihat.end = 5019;
 
