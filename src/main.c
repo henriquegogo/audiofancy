@@ -1,26 +1,47 @@
 #include <ao/ao.h>
 #include "sampler.h"
+#include "instrument.h"
 #include "keyboard.h"
 
-// These global are just for development tests
-Sampler *global_drums;
-struct Sampler_play_params global_kick;
-struct Sampler_play_params global_snare;
-struct Sampler_play_params global_hihat;
+Instrument *synth;
 
 void onclick(char key) {
     switch (key) {
-        case 122:
-            Sampler_play(global_drums, global_kick);
-            printf("Kick\n");
+        case KEY_Z:
+            Sampler_play(synth->sampler, synth->keys_params[0]);
             break;
-        case 99:
-            Sampler_play(global_drums, global_snare);
-            printf("Snare\n");
+        case KEY_S:
+            Sampler_play(synth->sampler, synth->keys_params[1]);
             break;
-        case 103:
-            Sampler_play(global_drums, global_hihat);
-            printf("Hihat\n");
+        case KEY_X:
+            Sampler_play(synth->sampler, synth->keys_params[2]);
+            break;
+        case KEY_D:
+            Sampler_play(synth->sampler, synth->keys_params[3]);
+            break;
+        case KEY_C:
+            Sampler_play(synth->sampler, synth->keys_params[4]);
+            break;
+        case KEY_V:
+            Sampler_play(synth->sampler, synth->keys_params[5]);
+            break;
+        case KEY_G:
+            Sampler_play(synth->sampler, synth->keys_params[6]);
+            break;
+        case KEY_B:
+            Sampler_play(synth->sampler, synth->keys_params[7]);
+            break;
+        case KEY_H:
+            Sampler_play(synth->sampler, synth->keys_params[8]);
+            break;
+        case KEY_N:
+            Sampler_play(synth->sampler, synth->keys_params[9]);
+            break;
+        case KEY_J:
+            Sampler_play(synth->sampler, synth->keys_params[10]);
+            break;
+        case KEY_M:
+            Sampler_play(synth->sampler, synth->keys_params[11]);
             break;
         default:
             printf("%d\n", key);
@@ -30,28 +51,9 @@ void onclick(char key) {
 int main(int argc, char *argv[]) {
     ao_initialize();
 
-    Sampler *drums = Sampler_init("./samples/drums.wav");
+    Sampler *juno = Sampler_init("./samples/synth.aif");
+    synth = Instrument_init(juno);
 
-    struct Sampler_play_params kick = Sampler_play_params_default();
-    kick.begin = 191;
-    kick.end = 454;
-
-    struct Sampler_play_params snare = Sampler_play_params_default();
-    snare.begin = 4300;
-    snare.end = 4790;
-
-    struct Sampler_play_params hihat = Sampler_play_params_default();
-    hihat.begin = 4797;
-    hihat.end = 5019;
-
-    Sampler_play(drums, kick);
-    Sampler_play(drums, snare);
-    Sampler_play(drums, hihat);
-
-    global_drums = drums;
-    global_kick = kick;
-    global_snare = snare;
-    global_hihat = hihat;
     Keyboard_listen(onclick);
 
     ao_shutdown();
