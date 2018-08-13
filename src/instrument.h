@@ -1,6 +1,7 @@
 #ifndef INSTRUMENT_H
 #define INSTRUMENT_H
 
+#include <math.h>
 #include "sampler.h"
 
 typedef struct Instrument {
