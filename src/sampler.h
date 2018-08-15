@@ -7,6 +7,7 @@
 #include <ao/ao.h>
 
 typedef struct Sampler {
+    pthread_t id;
     short *buffer;
     long buffer_size;
     ao_sample_format format;
@@ -23,7 +24,9 @@ Sampler_play_params Sampler_play_params_default();
 
 Sampler* Sampler_init(char filename[]);
 
-void Sampler_play(Sampler *sampler, struct Sampler_play_params options);
+pthread_t Sampler_play(Sampler *sampler, struct Sampler_play_params options);
+
+void Sampler_stop(pthread_t thread_id);
 
 void Sampler_destroy(Sampler *sampler);
 

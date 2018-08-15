@@ -90,7 +90,9 @@ static void play(struct thread_args_play *args) {
     free(buffer);
 }
 
-void Sampler_play(Sampler *sampler, struct Sampler_play_params options) {
+pthread_t Sampler_play(Sampler *sampler, struct Sampler_play_params options) {
+    pthread_t thread_id;
+
     if (sampler != NULL) {
         struct thread_args_play *args = malloc(sizeof(struct thread_args_play));
         args->sampler = sampler;
@@ -99,10 +101,16 @@ void Sampler_play(Sampler *sampler, struct Sampler_play_params options) {
         args->begin = options.begin;
         args->end = options.end;
 
-        pthread_t thread_id;
         pthread_create(&thread_id, NULL, (void *)play, args);
         pthread_detach(thread_id);
     }
+
+    sampler->id = thread_id;
+    return thread_id;
+}
+
+void Sampler_stop(pthread_t thread_id) {
+    pthread_cancel(thread_id);
 }
 
 void Sampler_destroy(Sampler *sampler) {
