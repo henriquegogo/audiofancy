@@ -1,6 +1,6 @@
 BINNAME = niobium
 SRC = $(wildcard src/*.c)
-CFLAGS = -std=gnu11 -Wall -lm -lSDL2 -lSDL2_mixer
+CFLAGS = -std=gnu11 -Wall -lm -lSDL2
 
 all:
 	$(CC) -o $(BINNAME) $(SRC) $(CFLAGS)
